@@ -53,7 +53,7 @@ test.describe("Automation flow task: ", () => {
     const resultMap = new Map();
 
     async function checkSeatsAvailability(number) {
-      await test.step(`Process Number ${number}`, async () => {
+      await test.step(`Check seats availability for area ${number}`, async () => {
         const seatPriceLineItem = syos.seatPriceLineItem.nth(0);
         const modalBackdrop = modal.backdrop;
 
