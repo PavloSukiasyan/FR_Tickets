@@ -17,7 +17,7 @@ test.describe("Automation flow task: ", () => {
     await page.goto("https://my.laphil.com/en/syos2/package/1203");
   });
 
-  test("Scenario 1", async ({ page }) => {
+  test.only("Scenario 1", async ({ page }) => {
     const syos = new SelectYourOwnSeatPage(page);
     const modal = new SYOSModalComponent(page);
 
@@ -29,8 +29,8 @@ test.describe("Automation flow task: ", () => {
       .toHaveText("Thursday Evenings 1 (TH1 / 7 Concerts)");
 
     await expect.soft(syos.ticketQuantityInput).toHaveValue("2");
-    await syos.incrementTickets(5);
-    await expect.soft(syos.ticketQuantityInput).toHaveValue("7");
+    await syos.incrementTickets(4);
+    await expect.soft(syos.ticketQuantityInput).toHaveValue("6");
 
     // With "Any Best Available Seat" option
     // await expect.soft(await syos.getAllAvailableSectorTypesCount()).toBe(7);
@@ -60,46 +60,60 @@ test.describe("Automation flow task: ", () => {
 
     async function processNumber(number) {
       await test.step(`Process Number ${number}`, async () => {
-        // TODO This timeout is needed to be set, so than one of two screens are loaded.
-        //  I've tried to fixe this, but it took me to long, so it's a temporary workaround :)
-        await page.waitForTimeout(2000);
+        const seatPriceLineItem = syos.seatPriceLineItem.nth(0);
+        const modalTitle = modal.title;
 
         await syos.clickAtDesiredArea(number);
         await syos.continueBtnClick();
 
-        // TODO This timeout is needed to be set, so than one of two screens are loaded.
-        await page.waitForTimeout(4000);
+        let waitForElements;
+        if (
+          (await seatPriceLineItem.isVisible()) ||
+          (await modalTitle.isVisible())
+        ) {
+          waitForElements = Promise.resolve();
+        } else {
+          waitForElements = Promise.race([
+            seatPriceLineItem.waitFor(),
+            modalTitle.waitFor(),
+          ]);
+        }
 
-        if (await syos.seatPriceLineItem.nth(0).isVisible()) {
+        try {
+          await Promise.race([waitForElements, page.waitForTimeout(7000)]); //Will wait less, if elements are there
+        } catch (error) {
+          console.error("Neither element is visible within the timeout.");
+          resultMap.set(
+            number,
+            `${namedActiveSectors[number]}: Something went wrong!`,
+          );
+          return;
+        }
+
+        if (await seatPriceLineItem.isVisible()) {
           resultMap.set(
             number,
             `${namedActiveSectors[number]}: There are seats together`,
           );
 
           await syos.backBtnClick();
-          await page.waitForTimeout(200);
           await modal.confirmModalComponent();
-          await page.waitForTimeout(200);
-        } else if (await modal.backdrop.isVisible()) {
+        } else if (await modalTitle.isVisible()) {
           resultMap.set(
             number,
             `${namedActiveSectors[number]}: There are NO seats together`,
           );
-          await page.waitForTimeout(200);
           await modal.closeModalComponent();
         } else {
           resultMap.set(
             number,
-            `${namedActiveSectors[number]}: Something went Wrong!`,
+            `${namedActiveSectors[number]}: Something went wrong!`,
           );
           await syos.backBtnClick();
           await modal.confirmModalComponent();
         }
 
         await syos.priceTypesEl.waitFor();
-        await page.waitForTimeout(1000);
-
-        console.log("resultMap: ", resultMap);
       });
     }
 
@@ -112,10 +126,9 @@ test.describe("Automation flow task: ", () => {
     //  Can be viewed in HTLM report of the Playwright.
     test.info().annotations.push({
       type: "Sections and availability",
-      description: Array.from(
-        resultMap,
-        ([k, v]) => ` [${k} - ${v}] `,
-      ).toString(),
+      description: Array.from(resultMap, ([k, v]) => `[${k} - ${v}]`).join(
+        ", ",
+      ),
     });
   });
 
