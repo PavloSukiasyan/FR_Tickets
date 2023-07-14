@@ -1,5 +1,5 @@
 // @ts-check
-const { defineConfig, devices } = require('@playwright/test');
+const { defineConfig, devices } = require("@playwright/test");
 
 /**
  * Read environment variables from file.
@@ -11,7 +11,7 @@ const { defineConfig, devices } = require('@playwright/test');
  * @see https://playwright.dev/docs/test-configuration
  */
 module.exports = defineConfig({
-  testDir: './src/tests',
+  testDir: "./src/tests",
   /* Maximum time one test can run for. */
   timeout: 120 * 1000,
   expect: {
@@ -30,10 +30,7 @@ module.exports = defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [
-    ['html', { open: 'always' }],
-    ['list']
-  ],
+  reporter: [["html", { open: "always" }], ["list"]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     headless: true,
@@ -41,19 +38,19 @@ module.exports = defineConfig({
     // baseURL: 'http://127.0.0.1:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    video: process.env.CI ? 'on-first-retry' : 'retain-on-failure',
+    trace: "on-first-retry",
+    screenshot: "only-on-failure",
+    video: process.env.CI ? "on-first-retry" : "retain-on-failure",
   },
 
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
-      testDir: './src/tests',
+      name: "chromium",
+      testDir: "./src/tests",
       use: {
-        ...devices['Desktop Chrome'],
-        viewport: { width: 1680, height: 1080 }
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1680, height: 1080 },
       },
     },
 
@@ -95,4 +92,3 @@ module.exports = defineConfig({
   //   reuseExistingServer: !process.env.CI,
   // },
 });
-
