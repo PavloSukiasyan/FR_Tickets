@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prettier": "npx prettier . --write",
     "test:chromium": "npx playwright test --project=chromium",
     "test:report": "npx playwright show-report"
   },
@@ -11,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.35.1"
+    "@playwright/test": "^1.35.1",
+    "prettier": "3.0.0"
   }
 }

@@ -1,28 +1,31 @@
 // @ts-check
-const { test, expect } = require('@playwright/test');
-const { SelectSeatsPage: SelectYourOwnSeatPage } = require('../pages/syos');
-const { SYOSModalComponent } = require('../pages/components/syosModal');
-const { getTextFromElement,
+const { test, expect } = require("@playwright/test");
+const { SelectSeatsPage: SelectYourOwnSeatPage } = require("../pages/syos");
+const { SYOSModalComponent } = require("../pages/components/syosModal");
+const {
+  getTextFromElement,
   convertNumberToCurrencyString,
-  convertStringToHaveDashAndSpace } = require('../pages/helper/uiHelper');
-const { Cart } = require('../pages/cart');
-const { DonationModalComponent } = require('../pages/components/donationModal');
+  convertStringToHaveDashAndSpace,
+} = require("../pages/helper/uiHelper");
+const { Cart } = require("../pages/cart");
+const { DonationModalComponent } = require("../pages/components/donationModal");
 
-test.describe('Automation flow task: ', () => {
+test.describe("Automation flow task: ", () => {
   test.beforeEach(async ({ page }) => {
     // await page.goto('https://my.laphil.com/en/syos2/performance/8928');
     // Started my work on this URL, but later switched to other
-    await page.goto('https://my.laphil.com/en/syos2/package/1203');
+    await page.goto("https://my.laphil.com/en/syos2/package/1203");
   });
 
-  test('Scenario 1', async ({ page }) => {
+  test("Scenario 1", async ({ page }) => {
     const syos = new SelectYourOwnSeatPage(page);
     const modal = new SYOSModalComponent(page);
 
     await expect(page).toHaveTitle("Select Your Own Seat | LA Phil");
     await expect.soft(syos.base).toBeVisible();
     await expect.soft(syos.inputGroupNumber).toBeVisible();
-    await expect.soft(syos.performanceDetailsTitle)
+    await expect
+      .soft(syos.performanceDetailsTitle)
       .toHaveText("Thursday Evenings 1 (TH1 / 7 Concerts)");
 
     await expect.soft(syos.ticketQuantityInput).toHaveValue("2");
@@ -41,7 +44,7 @@ test.describe('Automation flow task: ', () => {
     //  Can be viewed in HTLM report of the Playwright.
     test.info().annotations.push({
       type: "Total number of Available sectors",
-      description: sectorsNumbers.toString()
+      description: sectorsNumbers.toString(),
     });
 
     const namedActiveSectors = await syos.getNamesOfAvailableSectorNames();
@@ -50,7 +53,7 @@ test.describe('Automation flow task: ', () => {
     //  Can be viewed in HTLM report of the Playwright.
     test.info().annotations.push({
       type: "Available Sector Names",
-      description: namedActiveSectors.toString()
+      description: namedActiveSectors.toString(),
     });
 
     const resultMap = new Map();
@@ -68,18 +71,27 @@ test.describe('Automation flow task: ', () => {
         await page.waitForTimeout(4000);
 
         if (await syos.seatPriceLineItem.nth(0).isVisible()) {
-          resultMap.set(number, `${namedActiveSectors[number]}: There are seats together`);
+          resultMap.set(
+            number,
+            `${namedActiveSectors[number]}: There are seats together`,
+          );
 
           await syos.backBtnClick();
           await page.waitForTimeout(200);
           await modal.confirmModalComponent();
           await page.waitForTimeout(200);
         } else if (await modal.backdrop.isVisible()) {
-          resultMap.set(number, `${namedActiveSectors[number]}: There are NO seats together`);
+          resultMap.set(
+            number,
+            `${namedActiveSectors[number]}: There are NO seats together`,
+          );
           await page.waitForTimeout(200);
           await modal.closeModalComponent();
         } else {
-          resultMap.set(number, `${namedActiveSectors[number]}: Something went Wrong!`);
+          resultMap.set(
+            number,
+            `${namedActiveSectors[number]}: Something went Wrong!`,
+          );
           await syos.backBtnClick();
           await modal.confirmModalComponent();
         }
@@ -88,7 +100,6 @@ test.describe('Automation flow task: ', () => {
         await page.waitForTimeout(1000);
 
         console.log("resultMap: ", resultMap);
-
       });
     }
 
@@ -101,24 +112,28 @@ test.describe('Automation flow task: ', () => {
     //  Can be viewed in HTLM report of the Playwright.
     test.info().annotations.push({
       type: "Sections and availability",
-      description: Array.from(resultMap, ([k, v]) => ` [${k} - ${v}] `).toString()
+      description: Array.from(
+        resultMap,
+        ([k, v]) => ` [${k} - ${v}] `,
+      ).toString(),
     });
   });
 
-  test('Scenario 2', async ({ page }) => {
+  test("Scenario 2", async ({ page }) => {
     const syos = new SelectYourOwnSeatPage(page);
     const cart = new Cart(page);
     const donation = new DonationModalComponent(page);
 
     await expect(page).toHaveTitle("Select Your Own Seat | LA Phil");
-    await expect.soft(syos.performanceDetailsTitle)
+    await expect
+      .soft(syos.performanceDetailsTitle)
       .toHaveText("Thursday Evenings 1 (TH1 / 7 Concerts)");
     await expect.soft(syos.base).toBeVisible();
 
     await syos.bestTicketsClick();
 
     await expect.soft(syos.ticketQuantityInput).toHaveValue("2");
-    await syos.decrementTickets()
+    await syos.decrementTickets();
     await expect.soft(syos.ticketQuantityInput).toHaveValue("1");
     await syos.bestTicketsClick();
 
@@ -132,11 +147,15 @@ test.describe('Automation flow task: ', () => {
     await expect.soft(syos.seatNameLineItem).toContainText(nameLine);
     await syos.confirmSeatsBtnClick();
 
-    await expect(cart.base).toBeVisible({ timeout: 15000 })
+    await expect(cart.base).toBeVisible({ timeout: 15000 });
     await donation.skipDonation();
-    
-    await expect.soft(cart.itemSeatInfo).toContainText(convertStringToHaveDashAndSpace(nameLine));
-    await expect.soft(cart.price).toContainText(convertNumberToCurrencyString(ticketPrice));
+
+    await expect
+      .soft(cart.itemSeatInfo)
+      .toContainText(convertStringToHaveDashAndSpace(nameLine));
+    await expect
+      .soft(cart.price)
+      .toContainText(convertNumberToCurrencyString(ticketPrice));
     await expect.soft(cart.quantity).toContainText("1");
   });
 });
