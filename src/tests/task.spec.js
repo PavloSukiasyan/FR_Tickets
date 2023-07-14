@@ -61,7 +61,7 @@ test.describe("Automation flow task: ", () => {
     async function processNumber(number) {
       await test.step(`Process Number ${number}`, async () => {
         const seatPriceLineItem = syos.seatPriceLineItem.nth(0);
-        const modalTitle = modal.title;
+        const modalBackdrop = modal.backdrop;
 
         await syos.clickAtDesiredArea(number);
         /* ! Without this wait - ticket numbers are counted as default "2",
@@ -72,13 +72,13 @@ test.describe("Automation flow task: ", () => {
         let waitForElements;
         if (
           (await seatPriceLineItem.isVisible()) ||
-          (await modalTitle.isVisible())
+          (await modalBackdrop.isVisible())
         ) {
           waitForElements = Promise.resolve();
         } else {
           waitForElements = Promise.race([
             seatPriceLineItem.waitFor(),
-            modalTitle.waitFor(),
+            modalBackdrop.waitFor(),
           ]);
         }
 
@@ -101,7 +101,7 @@ test.describe("Automation flow task: ", () => {
 
           await syos.backBtnClick();
           await modal.confirmModalComponent();
-        } else if (await modalTitle.isVisible()) {
+        } else if (await modalBackdrop.isVisible()) {
           resultMap.set(
             number,
             `${namedActiveSectors[number]}: There are NO seats together`,
