@@ -64,6 +64,9 @@ test.describe("Automation flow task: ", () => {
         const modalTitle = modal.title;
 
         await syos.clickAtDesiredArea(number);
+        /* ! Without this wait - ticket numbers are counted as default "2",
+          and test result is that - tickets together are available */
+        await page.waitForTimeout(300);
         await syos.continueBtnClick();
 
         let waitForElements;
