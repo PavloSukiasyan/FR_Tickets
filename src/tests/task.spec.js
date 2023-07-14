@@ -17,7 +17,7 @@ test.describe("Automation flow task: ", () => {
     await page.goto("https://my.laphil.com/en/syos2/package/1203");
   });
 
-  test.only("Scenario 1", async ({ page }) => {
+  test("Scenario 1", async ({ page }) => {
     const syos = new SelectYourOwnSeatPage(page);
     const modal = new SYOSModalComponent(page);
 
