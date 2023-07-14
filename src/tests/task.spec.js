@@ -32,14 +32,8 @@ test.describe("Automation flow task: ", () => {
     await syos.incrementTickets(4);
     await expect.soft(syos.ticketQuantityInput).toHaveValue("6");
 
-    // With "Any Best Available Seat" option
-    // await expect.soft(await syos.getAllAvailableSectorTypesCount()).toBe(7);
-
     const sectorsNumbers = await syos.allAvailableSectorTypes.count();
     console.log("allAvailableSectorTypes - count: ", sectorsNumbers);
-    // await expect.soft(sectorsNumbers).toBe(8);
-
-    // Commentary: Those two Expects - are turned off - because, it's may be different every test launch.
 
     //  Can be viewed in HTLM report of the Playwright.
     test.info().annotations.push({
@@ -58,7 +52,7 @@ test.describe("Automation flow task: ", () => {
 
     const resultMap = new Map();
 
-    async function processNumber(number) {
+    async function checkSeatsAvailability(number) {
       await test.step(`Process Number ${number}`, async () => {
         const seatPriceLineItem = syos.seatPriceLineItem.nth(0);
         const modalBackdrop = modal.backdrop;
@@ -121,7 +115,7 @@ test.describe("Automation flow task: ", () => {
     }
 
     for (let i = 0; i < namedActiveSectors.length; i++) {
-      await processNumber(i);
+      await checkSeatsAvailability(i);
     }
 
     console.log("resultMap: ", resultMap);
