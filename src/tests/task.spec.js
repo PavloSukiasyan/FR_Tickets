@@ -64,48 +64,30 @@ test.describe("Automation flow task: ", () => {
         await syos.continueBtnClick();
 
         let waitForElements;
-        if (
-          (await seatPriceLineItem.isVisible()) ||
-          (await modalBackdrop.isVisible())
-        ) {
+        if ((await seatPriceLineItem.isVisible()) || (await modalBackdrop.isVisible())) {
           waitForElements = Promise.resolve();
         } else {
-          waitForElements = Promise.race([
-            seatPriceLineItem.waitFor(),
-            modalBackdrop.waitFor(),
-          ]);
+          waitForElements = Promise.race([seatPriceLineItem.waitFor(), modalBackdrop.waitFor()]);
         }
 
         try {
           await Promise.race([waitForElements, page.waitForTimeout(7000)]); //Will wait less, if elements are there
         } catch (error) {
           console.error("Neither element is visible within the timeout.");
-          resultMap.set(
-            number,
-            `${namedActiveSectors[number]}: Something went wrong!`,
-          );
+          resultMap.set(number, `${namedActiveSectors[number]}: Something went wrong!`);
           return;
         }
 
         if (await seatPriceLineItem.isVisible()) {
-          resultMap.set(
-            number,
-            `${namedActiveSectors[number]}: There are seats together`,
-          );
+          resultMap.set(number, `${namedActiveSectors[number]}: There are seats together`);
 
           await syos.backBtnClick();
           await modal.confirmModalComponent();
         } else if (await modalBackdrop.isVisible()) {
-          resultMap.set(
-            number,
-            `${namedActiveSectors[number]}: There are NO seats together`,
-          );
+          resultMap.set(number, `${namedActiveSectors[number]}: There are NO seats together`);
           await modal.closeModalComponent();
         } else {
-          resultMap.set(
-            number,
-            `${namedActiveSectors[number]}: Something went wrong!`,
-          );
+          resultMap.set(number, `${namedActiveSectors[number]}: Something went wrong!`);
           await syos.backBtnClick();
           await modal.confirmModalComponent();
         }
@@ -123,9 +105,7 @@ test.describe("Automation flow task: ", () => {
     //  Can be viewed in HTLM report of the Playwright.
     test.info().annotations.push({
       type: "Sections and availability",
-      description: Array.from(resultMap, ([k, v]) => `[${k} - ${v}]`).join(
-        ", ",
-      ),
+      description: Array.from(resultMap, ([k, v]) => `[${k} - ${v}]`).join(", "),
     });
   });
 
@@ -160,12 +140,8 @@ test.describe("Automation flow task: ", () => {
     await expect(cart.base).toBeVisible({ timeout: 15000 });
     await donation.skipDonation();
 
-    await expect
-      .soft(cart.itemSeatInfo)
-      .toContainText(convertStringToHaveDashAndSpace(nameLine));
-    await expect
-      .soft(cart.price)
-      .toContainText(convertNumberToCurrencyString(ticketPrice));
+    await expect.soft(cart.itemSeatInfo).toContainText(convertStringToHaveDashAndSpace(nameLine));
+    await expect.soft(cart.price).toContainText(convertNumberToCurrencyString(ticketPrice));
     await expect.soft(cart.quantity).toContainText("1");
   });
 });
