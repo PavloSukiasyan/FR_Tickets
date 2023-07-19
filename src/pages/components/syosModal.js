@@ -6,9 +6,7 @@ exports.SYOSModalComponent = class SYOSModalComponent {
     this.closeBtn = this.base.locator(".syos-modal__close");
     this.title = this.base.locator(".syos-enhanced-notice__title");
     this.message = this.base.locator(".syos-enhanced-notice__message p");
-    this.confirmBtn = this.base.locator(
-      '.syos-enhanced-notice__actions [class="syos-button"]',
-    );
+    this.confirmBtn = this.base.locator('.syos-enhanced-notice__actions [class="syos-button"]');
   }
 
   async closeModalComponent() {
